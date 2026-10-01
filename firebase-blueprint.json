@@ -1,0 +1,312 @@
+{
+  "entities": {
+    "admin": {
+      "title": "Admin",
+      "description": "Administrator account with management permissions",
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string",
+          "description": "Admin email address"
+        },
+        "role": {
+          "type": "string",
+          "description": "Role identifier, e.g. admin"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp when admin was registered"
+        }
+      },
+      "required": ["email", "role"]
+    },
+    "movie": {
+      "title": "Movie",
+      "description": "A video or film asset with Google Drive source, quality renditions, and streaming info",
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string",
+          "description": "Movie title",
+          "maxLength": 200
+        },
+        "description": {
+          "type": "string",
+          "description": "Movie synopsis or description",
+          "maxLength": 2000
+        },
+        "posterUrl": {
+          "type": "string",
+          "description": "Poster image URL",
+          "maxLength": 1000
+        },
+        "thumbnail": {
+          "type": "string",
+          "description": "Thumbnail image URL",
+          "maxLength": 1000
+        },
+        "googleDriveFileId": {
+          "type": "string",
+          "description": "Original file ID stored in Google Drive",
+          "maxLength": 256
+        },
+        "streamUrl": {
+          "type": "string",
+          "description": "Master HLS or MP4 stream URL",
+          "maxLength": 1000
+        },
+        "originalFileUrl": {
+          "type": "string",
+          "description": "Original uploaded source URL or file reference",
+          "maxLength": 1000
+        },
+        "duration": {
+          "type": "string",
+          "description": "Formatted duration string e.g. 1h 45m or 12m 30s",
+          "maxLength": 50
+        },
+        "durationSeconds": {
+          "type": "number",
+          "description": "Duration in seconds"
+        },
+        "genre": {
+          "type": "string",
+          "description": "Movie genre or category",
+          "maxLength": 100
+        },
+        "releaseYear": {
+          "type": "string",
+          "description": "Release year",
+          "maxLength": 10
+        },
+        "language": {
+          "type": "string",
+          "description": "Primary audio language",
+          "maxLength": 50
+        },
+        "rating": {
+          "type": "string",
+          "description": "Age rating e.g. PG-13",
+          "maxLength": 20
+        },
+        "status": {
+          "type": "string",
+          "description": "Status of the movie",
+          "enum": ["active", "inactive"]
+        },
+        "processingStatus": {
+          "type": "string",
+          "description": "Transcoding status",
+          "enum": ["UPLOADING", "IMPORTING", "PROCESSING", "READY", "FAILED"]
+        },
+        "availableQualities": {
+          "type": "string",
+          "description": "Comma separated available qualities e.g. 1080p,720p,480p,360p",
+          "maxLength": 100
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Creation timestamp"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Last update timestamp"
+        }
+      },
+      "required": ["title", "streamUrl", "status", "processingStatus"]
+    },
+    "subtitle": {
+      "title": "Subtitle",
+      "description": "Closed captions and subtitles in various languages",
+      "type": "object",
+      "properties": {
+        "movieId": {
+          "type": "string",
+          "description": "Associated movie ID",
+          "maxLength": 128
+        },
+        "languageCode": {
+          "type": "string",
+          "description": "Language ISO code e.g. en, bn, hi, es",
+          "maxLength": 10
+        },
+        "languageName": {
+          "type": "string",
+          "description": "Display name e.g. English, Bengali, Hindi",
+          "maxLength": 50
+        },
+        "label": {
+          "type": "string",
+          "description": "Track label",
+          "maxLength": 50
+        },
+        "fileUrl": {
+          "type": "string",
+          "description": "Direct URL to WebVTT file",
+          "maxLength": 1000
+        },
+        "isDefault": {
+          "type": "boolean",
+          "description": "Whether this subtitle track is default"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Creation timestamp"
+        }
+      },
+      "required": ["movieId", "languageCode", "languageName", "fileUrl"]
+    },
+    "liveState": {
+      "title": "LiveState",
+      "description": "Global authoritative Live TV channel broadcast state",
+      "type": "object",
+      "properties": {
+        "movieId": {
+          "type": "string",
+          "description": "Currently broadcasting movie ID",
+          "maxLength": 128
+        },
+        "movieTitle": {
+          "type": "string",
+          "description": "Title of currently broadcasting movie",
+          "maxLength": 200
+        },
+        "isPlaying": {
+          "type": "boolean",
+          "description": "Whether live channel is playing"
+        },
+        "position": {
+          "type": "number",
+          "description": "Playback position in seconds at updatedAtMillis"
+        },
+        "updatedAtMillis": {
+          "type": "number",
+          "description": "Timestamp in milliseconds when state was updated"
+        },
+        "status": {
+          "type": "string",
+          "description": "Channel status: LIVE, PAUSED, OFFLINE, ENDED",
+          "enum": ["LIVE", "PAUSED", "OFFLINE", "ENDED"]
+        },
+        "controllerId": {
+          "type": "string",
+          "description": "Admin UID of host",
+          "maxLength": 128
+        }
+      },
+      "required": ["status", "isPlaying", "position"]
+    },
+    "chatMessage": {
+      "title": "ChatMessage",
+      "description": "Global live broadcast chat message",
+      "type": "object",
+      "properties": {
+        "sessionId": {
+          "type": "string",
+          "description": "Anonymous viewer session ID or admin UID",
+          "maxLength": 128
+        },
+        "displayLabel": {
+          "type": "string",
+          "description": "Viewer label e.g. Viewer 3 or Host",
+          "maxLength": 50
+        },
+        "message": {
+          "type": "string",
+          "description": "Chat message content",
+          "maxLength": 500
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Message timestamp"
+        }
+      },
+      "required": ["sessionId", "displayLabel", "message"]
+    },
+    "viewerPresence": {
+      "title": "ViewerPresence",
+      "description": "Active viewer presence heartbeat on the Live TV channel",
+      "type": "object",
+      "properties": {
+        "sessionId": {
+          "type": "string",
+          "description": "Session ID of viewer",
+          "maxLength": 128
+        },
+        "displayLabel": {
+          "type": "string",
+          "description": "Display label",
+          "maxLength": 50
+        },
+        "lastActive": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Heartbeat timestamp"
+        }
+      },
+      "required": ["sessionId", "displayLabel"]
+    },
+    "setting": {
+      "title": "Setting",
+      "description": "Global settings for the Live TV platform",
+      "type": "object",
+      "properties": {
+        "platformName": {
+          "type": "string",
+          "description": "Channel or platform name",
+          "maxLength": 100
+        },
+        "logoUrl": {
+          "type": "string",
+          "description": "Logo URL",
+          "maxLength": 1000
+        },
+        "chatEnabled": {
+          "type": "boolean",
+          "description": "Whether live chat is enabled on the public channel"
+        },
+        "defaultQuality": {
+          "type": "string",
+          "description": "Default playback quality e.g. Auto",
+          "maxLength": 20
+        }
+      },
+      "required": ["platformName"]
+    }
+  },
+  "firestore": {
+    "/admins/{adminId}": {
+      "schema": "admin",
+      "description": "Registered administrators"
+    },
+    "/movies/{movieId}": {
+      "schema": "movie",
+      "description": "Movies library for the Live TV channel"
+    },
+    "/movies/{movieId}/subtitles/{subtitleId}": {
+      "schema": "subtitle",
+      "description": "Subtitles for a specific movie"
+    },
+    "/liveState/current": {
+      "schema": "liveState",
+      "description": "Global authoritative Live TV channel broadcast state"
+    },
+    "/chatMessages/{messageId}": {
+      "schema": "chatMessage",
+      "description": "Live channel chat messages"
+    },
+    "/viewerPresence/{sessionId}": {
+      "schema": "viewerPresence",
+      "description": "Live viewer presence heartbeats"
+    },
+    "/settings/{settingId}": {
+      "schema": "setting",
+      "description": "Platform global configuration settings"
+    }
+  }
+}

@@ -1,0 +1,94 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function isAdmin() {
+      return (request.auth != null && (
+        request.auth.token.email == 'storagedrive2solutionexplorer@gmail.com' ||
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+      )) || (
+        incoming().get('adminAuthKey', '') == 'cinelive_admin_verified_tanvir_2026'
+      );
+    }
+
+    function isExistingAdmin() {
+      return (request.auth != null && (
+        request.auth.token.email == 'storagedrive2solutionexplorer@gmail.com' ||
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+      )) || (
+        resource.data.get('adminAuthKey', '') == 'cinelive_admin_verified_tanvir_2026'
+      );
+    }
+
+    // Movies collection - Public read, Admin-only write
+    match /movies/{movieId} {
+      allow get, list: if true;
+      allow create, update: if isAdmin() &&
+        incoming().title is string && incoming().title.size() <= 200 &&
+        incoming().streamUrl is string && incoming().streamUrl.size() <= 1000;
+      allow delete: if isExistingAdmin();
+
+      // Subtitles subcollection
+      match /subtitles/{subtitleId} {
+        allow get, list: if true;
+        allow create, update: if isAdmin();
+        allow delete: if isExistingAdmin();
+      }
+    }
+
+    // Global Live State (Live TV Broadcast) - Public read, Admin-only write
+    match /liveState/{stateId} {
+      allow get, list: if true;
+      allow create, update: if isAdmin();
+      allow delete: if isExistingAdmin();
+    }
+
+    // Platform Settings - Public read, Admin-only write
+    match /settings/{settingId} {
+      allow get, list: if true;
+      allow create, update: if isAdmin();
+      allow delete: if isExistingAdmin();
+    }
+
+    // Global Chat Messages - Public read & create, Admin-only delete
+    match /chatMessages/{messageId} {
+      allow get, list: if true;
+      allow create: if incoming().message is string &&
+        incoming().message.size() > 0 &&
+        incoming().message.size() <= 500 &&
+        incoming().displayLabel is string &&
+        incoming().displayLabel.size() <= 50;
+      allow update, delete: if isAdmin() || isExistingAdmin();
+    }
+
+    // Viewer Presence (Heartbeats for online viewer count)
+    match /viewerPresence/{sessionId} {
+      allow get, list: if true;
+      allow create, update: if isValidId(sessionId) && incoming().sessionId == sessionId;
+      allow delete: if isValidId(sessionId);
+    }
+
+    // Admins metadata
+    match /admins/{adminId} {
+      allow get: if true;
+      allow list, create, update, delete: if isAdmin() || isExistingAdmin();
+    }
+
+    // Connection testing
+    match /test/{docId} {
+      allow read, write: if true;
+    }
+
+    // Default deny fallback
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

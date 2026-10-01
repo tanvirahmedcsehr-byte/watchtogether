@@ -1,0 +1,6 @@
+{
+  "name": "WatchTogether",
+  "description": "CineLive - Private Live TV streaming channel with zero-cost Google Drive source archive, FFmpeg transcoding, synchronized real-time playback, and multilingual subtitles.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
